@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports गyaan</title>
+     <link rel="icon" type="image/png" href="clarity.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        
+        }
+
+        /* The main container for the video */
+        .video-background-holder {
+            position: fixed; /* Fixes the video in place */
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100; /* Puts the video behind all other content */
+            background-size: cover;
+            transition: 1s opacity;
+        }
+
+        /* The video element itself */
+        .video-background-holder video {
+            width: 100vw; /* Viewport Width */
+            height: 100vh; /* Viewport Height */
+            object-fit: cover; /* Ensures the video covers the area without stretching */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+       
+        header h1{
+            background-color: rgba(8, 1, 1, 0.1);
+            color: #3498db;
+            font-size: xxx-large;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-weight: bolder;
+            
+        }
+        .x{
+            background-color: rgba(8, 1, 1, 0.1);
+            color:white;
+            font-size: small;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-weight: bolder;
+
+        }
+
+       
+        .info-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* Simple preloader for better UX */
+        #loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Autocomplete styles */
+        .autocomplete-item {
+            cursor: pointer;
+        }
+        .autocomplete-item:hover {
+            background-color: #374151; /* gray-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div class="video-background-holder">
+        <video playsinline autoplay muted loop>
+            <source src="https://videos.pexels.com/video-files/2297636/2297636-uhd_2560_1440_30fps.mp4" type="video/mp4">
+            
+        </video>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8">
+        <!-- Header Section -->
+        <header class="text-center mb-8">
+            <h1>Sports गyaan</h1>
+            <p class="x"> Athlete statistics and career analysis.</p>
+        
+        </header>
+
+        <!-- Search Bar -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <div class="relative" id="search-wrapper">
+                <input type="text" id="searchInput" class="w-full bg-gray-800 border border-gray-700 text-white rounded-full py-3 px-6 pl-12 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter athlete's name (e.g., 'Lionel Messi')" autocomplete="off">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                    <svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                
+                <button id="searchButton" class="absolute inset-y-0 right-0 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full px-6 py-2 m-1.5 transition-colors duration-300">Search</button>
+                 <!-- Autocomplete suggestions container -->
+                <div id="autocomplete-list" class="absolute z-10 w-full bg-gray-800 border border-gray-700 rounded-b-lg shadow-lg mt-1 hidden"></div>
+            </div>
+        </div>
+
+        <!-- Loader -->
+        <div id="loaderContainer" class="hidden justify-center my-8">
+            <div id="loader"></div>
+            <p id="loaderText" class="ml-4 text-lg self-center">Searching...</p>
+        </div>
+
+        <!-- Multiple Results Display -->
+        <div id="multipleResultsDisplay" class="hidden max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold text-center mb-6">Multiple athletes found. Please select one:</h2>
+            <div id="multipleResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Multiple result cards will be injected here -->
+            </div>
+        </div>
+
+        <!-- Single Athlete Information Display -->
+                <main id="athleteDisplay" class="hidden">
+
+            <div class="max-w-4xl mx-auto mb-6 text-left">
+            <button id="homeButton" class="bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-full px-5 py-2 transition-colors duration-300 flex items-center">
+            <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Back to Search
+            </button>
+            </div>
+
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column: Profile Card -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gray-800 rounded-2xl p-6 shadow-lg h-full">
+                        <div class="flex flex-col items-center">
+                            <img id="athleteImage" src="https://placehold.co/150x150/600/FFF?text=Athlete" alt="Athlete Photo" class="w-32 h-32 rounded-full mb-4 border-4 border-blue-500 object-cover bg-gray-700">
+                            <h2 id="athleteName" class="text-3xl font-bold text-center">Athlete Name</h2>
+                            <p id="athleteSport" class="text-gray-400">Sport</p>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <div><p class="text-sm text-gray-400">Date of Birth</p><p id="athleteDob" class="font-semibold">N/A</p></div>
+                             <div><p class="text-sm text-gray-400">Nationality</p><p id="athleteNationality" class="font-semibold">N/A</p></div>
+                             <div><p class="text-sm text-gray-400">Team</p><p id="athleteTeam" class="font-semibold">N/A</p></div>
+                            <div><p class="text-sm text-gray-400">Est. Market Value</p><p id="marketValue" class="text-2xl font-bold text-green-400">N/A</p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Column: AI Generated Info -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="info-card rounded-2xl p-6"><h3 class="text-2xl font-bold mb-3">Biography</h3><p id="biography" class="text-gray-300 leading-relaxed">N/A</p></div>
+                    <div class="info-card rounded-2xl p-6"><h3 class="text-2xl font-bold mb-4">Major Accolades</h3><ul id="accoladesList" class="list-disc list-inside space-y-2 text-gray-300"><li>Generating...</li></ul></div>
+                    <div class="info-card rounded-2xl p-6"><h3 class="text-2xl font-bold mb-4">Key Records</h3><ul id="recordsList" class="list-disc list-inside space-y-2 text-gray-300"><li>Generating...</li></ul></div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Not Found Message -->
+        <div id="notFoundMessage" class="hidden text-center mt-8"><p class="text-xl text-red-400">Athlete not found. Please check the name and try again.</p></div>
+        <!-- API Error Message -->
+        <div id="apiErrorMessage" class="hidden text-center mt-8"><p class="text-xl text-yellow-400">Could not retrieve athlete data. Please try again later.</p></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Element Refs
+            const searchButton = document.getElementById('searchButton');
+            const searchInput = document.getElementById('searchInput');
+            const searchWrapper = document.getElementById('search-wrapper');
+            const autocompleteList = document.getElementById('autocomplete-list');
+            
+            const athleteDisplay = document.getElementById('athleteDisplay');
+            const multipleResultsDisplay = document.getElementById('multipleResultsDisplay');
+            const multipleResultsList = document.getElementById('multipleResultsList');
+
+            const notFoundMessage = document.getElementById('notFoundMessage');
+            const apiErrorMessage = document.getElementById('apiErrorMessage');
+            const loaderContainer = document.getElementById('loaderContainer');
+            const loaderText = document.getElementById('loaderText');
+            
+            // API endpoint
+            const SPORTSDB_API_URL = 'https://www.thesportsdb.com/api/v1/json/3/searchplayers.php';
+
+            // --- Main Search Logic ---
+            const searchAthlete = async () => {
+                hideAutocomplete();
+                const query = searchInput.value.trim();
+                if (!query) return;
+
+                setLoadingState(true, 'Searching for athlete...');
+                resetUI();
+
+                try {
+                    const response = await fetch(`${SPORTSDB_API_URL}?p=${encodeURIComponent(query)}`);
+                    if (!response.ok) throw new Error('SportsDB network error');
+                    const data = await response.json();
+
+                    if (!data.player || data.player.length === 0) {
+                        notFoundMessage.classList.remove('hidden');
+                    } else if (data.player.length === 1) {
+                        await showSingleAthlete(data.player[0]);
+                    } else {
+                        displayMultipleResults(data.player);
+                    }
+                } catch (error) {
+                    console.error('Error in search process:', error);
+                    apiErrorMessage.classList.remove('hidden');
+                } finally {
+                    setLoadingState(false);
+                }
+            };
+
+            // --- Display Logic ---
+            const showSingleAthlete = async (player) => {
+                resetUI();
+                setLoadingState(true, 'Analyzing biography...');
+                try {
+                    displayBasicInfo(player);
+                    athleteDisplay.classList.remove('hidden');
+                    const biographyText = player.strDescriptionEN || `No detailed biography available for ${player.strPlayer}.`;
+                    const enhancedData = await getEnhancedData(player.strPlayer, biographyText);
+                    displayEnhancedInfo(enhancedData);
+                } catch(error) {
+                    console.error("Error showing single athlete:", error);
+                    apiErrorMessage.classList.remove('hidden');
+                } finally {
+                    setLoadingState(false);
+                }
+            };
+            
+            const displayMultipleResults = (players) => {
+                multipleResultsList.innerHTML = '';
+                players.forEach(player => {
+                    const card = document.createElement('div');
+                    card.className = 'info-card p-4 rounded-lg flex flex-col items-center text-center';
+                    
+                    const playerImg = player.strCutout || player.strThumb || 'https://placehold.co/80x80/600/FFF?text=N/A';
+                    card.innerHTML = `
+                        <img src="${playerImg}" alt="${player.strPlayer}" class="w-20 h-20 rounded-full object-cover mb-3 bg-gray-700" onerror="this.src='https://placehold.co/80x80/600/FFF?text=N/A'"/>
+                        <h3 class="font-bold text-lg">${player.strPlayer}</h3>
+                        <p class="text-gray-400 text-sm">${player.strSport}</p>
+                        <p class="text-gray-400 text-sm mb-3">${player.strTeam}</p>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full px-4 py-1 text-sm w-full">View Details</button>
+                    `;
+                    card.querySelector('button').addEventListener('click', () => showSingleAthlete(player));
+                    multipleResultsList.appendChild(card);
+                });
+                multipleResultsDisplay.classList.remove('hidden');
+            };
+
+            const displayBasicInfo = (player) => {
+                const setText = (id, value) => { document.getElementById(id).textContent = value || 'N/A'; };
+                
+                const athleteImage = document.getElementById('athleteImage');
+                athleteImage.src = player.strCutout || player.strThumb || 'https://placehold.co/150x150/600/FFF?text=No+Image';
+                athleteImage.onerror = () => { athleteImage.src = 'https://placehold.co/150x150/600/FFF?text=Error'; };
+                
+                setText('athleteName', player.strPlayer);
+                setText('athleteSport', player.strSport);
+                setText('athleteDob', player.dateBorn);
+                setText('athleteNationality', player.strNationality);
+                setText('athleteTeam', player.strTeam);
+                setText('biography', "Analyzing... please wait.");
+
+                document.getElementById('marketValue').textContent = "Analyzing...";
+                document.getElementById('accoladesList').innerHTML = '<li>Analyzing...</li>';
+                document.getElementById('recordsList').innerHTML = '<li>Analyzing...</li>';
+            };
+            
+            const displayEnhancedInfo = (data) => {
+                document.getElementById('marketValue').textContent = data.marketValue || "N/A";
+                document.getElementById('biography').textContent = data.summary || "No summary available.";
+                const renderList = (listId, items, fallbackText) => {
+                    const listEl = document.getElementById(listId);
+                    listEl.innerHTML = '';
+                    if (items && items.length > 0) {
+                        items.forEach(item => {
+                            const li = document.createElement('li');
+                            li.textContent = item;
+                            listEl.appendChild(li);
+                        });
+                    } else {
+                        listEl.innerHTML = `<li>${fallbackText}</li>`;
+                    }
+                };
+                renderList('accoladesList', data.accolades, 'No specific accolades found.');
+                renderList('recordsList', data.records, 'No specific records found.');
+            };
+
+            // --- Autocomplete Logic ---
+            const handleAutocomplete = async (e) => {
+                const query = e.target.value;
+                if (query.length < 3) {
+                    hideAutocomplete();
+                    return;
+                }
+                try {
+                    const response = await fetch(`${SPORTSDB_API_URL}?p=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    if (data.player) {
+                        displayAutocomplete(data.player);
+                    } else {
+                        hideAutocomplete();
+                    }
+                } catch (error) {
+                    console.error("Autocomplete fetch error:", error);
+                    hideAutocomplete();
+                }
+            };
+
+            const displayAutocomplete = (players) => {
+                autocompleteList.innerHTML = '';
+                if (!players) {
+                    hideAutocomplete();
+                    return;
+                }
+                players.slice(0, 5).forEach(player => { // Show max 5 suggestions
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item p-3 border-b border-gray-700';
+                    item.textContent = `${player.strPlayer} (${player.strSport})`;
+                    item.addEventListener('mousedown', () => { // mousedown fires before blur
+                        searchInput.value = player.strPlayer;
+                        hideAutocomplete();
+                        searchAthlete();
+                    });
+                    autocompleteList.appendChild(item);
+                });
+                autocompleteList.classList.remove('hidden');
+            };
+
+
+            
+            
+            const hideAutocomplete = () => autocompleteList.classList.add('hidden');
+
+
+
+            const getEnhancedData = async (playerName, biography) => {
+                const prompt = `
+                You are a sports analyst AI. Your task is to provide a detailed analysis of an athlete.
+                
+                Athlete's Name: "${playerName}"
+
+                Provided Biography (may be short or empty): "${biography}"
+
+                Instructions:
+                1.  First, rely on your own general knowledge about "${playerName}" to generate the information.
+                2.  Use the "Provided Biography" as secondary context to supplement your knowledge, but do not be limited by it if it is sparse.
+                3.  Provide an estimated current market value (e.g., in Euros or USD, specify which). If it's a sport where this isn't common, say "Not applicable".
+                4.  Generate a concise summary (2-4 sentences) of their career and playing style.
+                5.  List their most significant career accolades (e.g., championships, individual awards).
+                6.  List key records they hold.
+                
+                If you have no knowledge of this athlete and the biography is empty, then and only then, you can state that information is unavailable.
+                `;
+
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                marketValue: { type: "STRING" }, summary: { type: "STRING" },
+                                accolades: { type: "ARRAY", items: { type: "STRING" } },
+                                records: { type: "ARRAY", items: { type: "STRING" } }
+                            },
+                            required: ["marketValue", "summary", "accolades", "records"]
+                        }
+                    }
+                };
+                // IMPORTANT: The API key is left blank here. In a local environment (like VS Code), 
+                // you must replace "" with your own key from Google AI Studio. 
+                // Do NOT share your key publicly.
+                const apiKey = "AIzaSyCrcHskCr_UzrHQIS6v0tQZIOGX1q50eKc";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`Gemini API error: ${response.statusText}`);
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0) {
+                        return JSON.parse(result.candidates[0].content.parts[0].text);
+                    }
+                    throw new Error("Invalid response from Gemini API.");
+                } catch(e) {
+                    console.error("Gemini call failed:", e);
+                    // Provide a user-friendly object on failure so the UI doesn't break
+                    return { 
+                        marketValue: "N/A", 
+                        summary: "AI analysis could not be completed at this time.", 
+                        accolades: [], 
+                        records: [] 
+                    };
+                }
+            };
+
+            // --- UI State Management ---
+            const setLoadingState = (isLoading, text = '') => {
+                if (isLoading) {
+                    loaderContainer.classList.remove('hidden');
+                    loaderContainer.classList.add('flex');
+                    loaderText.textContent = text;
+                    searchButton.disabled = true;
+                } else {
+                    loaderContainer.classList.add('hidden');
+                    loaderContainer.classList.remove('flex');
+                    searchButton.disabled = false;
+                    searchButton.textContent = 'Search';
+                }
+            };
+
+            const resetUI = () => {
+                athleteDisplay.classList.add('hidden');
+                multipleResultsDisplay.classList.add('hidden');
+                notFoundMessage.classList.add('hidden');
+                apiErrorMessage.classList.add('hidden');
+            };
+
+           
+
+
+              const goHome = () => {
+                resetUI(); // Re-use the reset function
+                searchInput.value = ''; // Clear the search input
+                window.scrollTo(0, 0); // Scroll to the top of the page
+            };
+
+            // --- Event Listeners ---
+            searchButton.addEventListener('click', searchAthlete);
+            searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') searchAthlete(); });
+            searchInput.addEventListener('input', handleAutocomplete);
+            homeButton.addEventListener('click', goHome); // <-- 3. ADDED EVENT LISTENER
+
+            // Hide autocomplete when clicking outside the search wrapper
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    hideAutocomplete();
+                }   
+
+
+
+                
+            });
+        });
+
+
+        // For automatic video 
+
+       
+    </script>
+</body>
+</html>
