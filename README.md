@@ -13,21 +13,6 @@ This is a brief, engaging overview of your project. What does it do? What proble
 * **Feature 3:** Continue listing important functionalities.
 * **And so on...**
 
-## 🛠️ Technologies Used
-
-* **[Technology Name 1]**: Briefly explain why you used it or what role it plays.
-* **[Technology Name 2]**: Another technology.
-* **[Technology Name 3]**: Add more as needed.
-
-## 🚦 Getting Started
-
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
-
-### Prerequisites
-
-* **[Prerequisite 1]**: e.g., Node.js (v18.x or higher)
-* **[Prerequisite 2]**: e.g., Python (3.9 or higher)
-* **[Prerequisite 3]**: Any other essential software or accounts (e.g., API keys, database setup).
 
 ### Installation
 
@@ -79,9 +64,9 @@ If your project requires environment variables or specific configurations, expla
 
 Explain how to use your project. Provide simple steps, examples, or screenshots if necessary.
 
-1.  **Step 1:** Describe the first action a user should take.
-2.  **Step 2:** Describe the next action.
-3.  **Example:** If it's a command-line tool, provide an example command.
+1.  **Step 1:** Search player name.
+2.  **Step 2:** Player profile will be visble.
+
 
 ## 🧪 Running Tests (if applicable)
 
